@@ -3,6 +3,12 @@
  * 
  */
 
+// evm
+import { mnemonicToAccount } from 'viem/accounts'
+// bip39
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
+
 /**
  * Use WebAuthn to store authentication-protected arbitrary bytes
  *
@@ -80,13 +86,78 @@ function checkBrowserWebAuthnSupport(): boolean {
   return true;
 }
 
-function createSigpassWallet() {
-  // Create a new wallet
+async function createSigpassWallet(name: string) {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  /**
+   * Store the private key into authenticated storage
+   */
+  const handle = await createOrThrow(name, bytes);
+  /**
+   * Store the handle to the private key into some unauthenticated storage
+   */
+  if (!handle) {
+    return null;
+  }
+  const cache = await caches.open("gmgn-storage");
+  const request = new Request("gmgn-wallet");
+  const response = new Response(handle);
+  await cache.put(request, response);
+  localStorage.setItem("WALLET_STATUS", "TRUE");
+
+  // Return the handle
+  if (handle) {
+    return handle;
+  } else {
+    return null;
+  }
 }
 
-function getSigpassWallet() {
-  // Get the wallet
+async function checkSigpassWallet() {
+  /**
+   * Retrieve the handle to the private key from some unauthenticated storage
+   */
+  const status: string | null = localStorage.getItem("WALLET_STATUS");
+
+  if (status) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
-export { createOrThrow, getOrThrow, checkBrowserWebAuthnSupport, createSigpassWallet, getSigpassWallet };
+async function getSigpassWallet() {
+  /**
+   * Retrieve the handle to the private key from some unauthenticated storage
+   */
+  const cache = await caches.open("gmgn-storage");
+  const request = new Request("gmgn-wallet");
+  const response = await cache.match(request);
+  const handle = response
+    ? new Uint8Array(await response.arrayBuffer())
+    : new Uint8Array();
+  /**
+   * Retrieve the private key from authenticated storage
+   */
+  const bytes = await getOrThrow(handle);
+  if (!bytes) {
+    return null;
+  }
+  const mnemonicPhrase = bip39.entropyToMnemonic(bytes, wordlist);
+  // const privateKey = fromBytes(bytes, "hex");
+  if (mnemonicPhrase) {
+    // const account = privateKeyToAccount(privateKey as Address);
+    // derive the evm account from mnemonic
+    const evmAccount = mnemonicToAccount(mnemonicPhrase,
+      {
+        accountIndex: 0,
+        addressIndex: 0,
+      }
+    );
+    return evmAccount;
+  } else {
+    return null;
+  }
+}
+
+export { createOrThrow, getOrThrow, checkBrowserWebAuthnSupport, createSigpassWallet, getSigpassWallet, checkSigpassWallet };
 
