@@ -36,8 +36,8 @@ const config = getDefaultConfig({
     kairos
   ],
   transports: {
-    [kaia.id]: http('https://public-en.node.kaia.io'),
-    [kairos.id]: http('https://public-en-kairos.node.kaia.io'),
+    [kaia.id]: http('https://rpc.ankr.com/kaia'),
+    [kairos.id]: http('https://rpc.ankr.com/kaia_testnet'),
   },
   ssr: true, // Because it is Nextjs's App router, you need to declare ssr as true
 });

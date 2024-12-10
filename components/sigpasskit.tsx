@@ -3,12 +3,23 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy, Check } from 'lucide-react';
-import { Account, Address } from "viem/accounts";
+import { Address } from "viem/accounts";
 import { createSigpassWallet, getSigpassWallet, checkSigpassWallet } from "@/lib/sigpass";
+import { kairos } from 'wagmi/chains'
+
+// this part is demo so feel free to remove
+import { useSendTransaction, useBalance } from 'wagmi'
+import { parseEther, formatEther } from 'viem'
 
 export default function SigpassKit() {
   const [wallet, setWallet] = useState<boolean>(false);
-  const [account, setAccount] = useState<Account | null>(null);
+  const [address, setAddress] = useState<Address | undefined>(undefined);
+  const { data: hash, sendTransaction } = useSendTransaction();
+  const balance = useBalance({
+    chainId: kairos.id,
+    address: address,
+  })
+
 
   useEffect(() => {
     async function fetchWalletStatus() {
@@ -20,21 +31,36 @@ export default function SigpassKit() {
 
   async function getWallet() {
     const account = await getSigpassWallet();
-    setAccount(account);
+    if (account) {
+      setAddress(account.address);
+    }
   }
 
   function truncateAddress(address: Address) {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   }
 
-  return (
-    <div>
+  function truncateHash(hash: string) {
+    return `${hash.slice(0, 6)}...${hash.slice(-4)}`;
+  }
 
+  async function send() {
+    const account = await getSigpassWallet();
+    sendTransaction({ 
+      account: account,     
+      to: '0xe3d25540BA6CED36a0ED5ce899b99B5963f43d3F',
+      value: parseEther('0.001'),
+      chainId: kairos.id,
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
       {
-        account ? (
+        address ? (
           <WalletCopyButton
-            copyText={account.address}
-            buttonTitle={truncateAddress(account.address)}
+            copyText={address}
+            buttonTitle={truncateAddress(address)}
           />
         ) : (
           <Button
@@ -54,6 +80,12 @@ export default function SigpassKit() {
           </Button>
         )
       }
+      <p>
+        {balance?.data?.value ? `Balance: ${formatEther(balance.data.value)}` : "Balance: 0"}
+      </p>
+      <Button
+        onClick={send}
+      >{hash ? <a href={`https://kairos.kaiascan.io/tx/${hash}`}>{truncateHash(hash)}</a> : "Send"}</Button>
     </div>
   )
 }
