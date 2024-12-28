@@ -94,8 +94,12 @@ export default function SigpassKit() {
   }
 
   // truncate address to 6 characters and add ... at the end
-  function truncateAddress(address: Address, length: number = 4) {
-    return `${address.slice(0, length)}...${address.slice(-length)}`;
+  function truncateAddress(address: Address, length: number) {
+    if (length > 6) {
+      return `${address.slice(0, length)}...${address.slice(-length)}`;
+    } else {
+      return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    }
   }
 
   // copy the address to the clipboard
@@ -210,7 +214,7 @@ export default function SigpassKit() {
                 <DialogTitle>Wallet</DialogTitle>
               </DialogHeader>
               <DialogDescription className="flex flex-col gap-2 text-primary text-center font-bold text-lg items-center">
-                {truncateAddress(address, 4)}
+                {truncateAddress(address)}
               </DialogDescription>
               <div className="grid grid-cols-2 gap-4">
                 <Button onClick={copyAddress} className="rounded-xl font-bold text-md hover:scale-105 transition-transform">
@@ -338,7 +342,7 @@ export default function SigpassKit() {
                 </DrawerClose>
               </div>
               <DrawerDescription className="flex flex-col gap-2 text-primary text-center font-bold text-lg items-center">
-                {truncateAddress(address, 4)}
+                {truncateAddress(address)}
               </DrawerDescription>
             </DrawerHeader>
             <div className="flex flex-col items-center gap-2">
