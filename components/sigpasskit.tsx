@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import '@rainbow-me/rainbowkit/styles.css';
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, KeyRound, Ban, ExternalLink, LogOut, ChevronDown, X } from 'lucide-react';
+import { Copy, Check, KeyRound, Ban, ExternalLink, LogOut, ChevronDown, X, ChevronRight } from 'lucide-react';
 import { Address } from 'viem';
 import { createSigpassWallet, getSigpassWallet, checkSigpassWallet, checkBrowserWebAuthnSupport } from "@/lib/sigpass";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -34,7 +34,7 @@ import { atomWithStorage, RESET } from 'jotai/utils';
 
 
 // Set the string key and the initial value
-export const addressAtom = atomWithStorage<Address | undefined>('SIGPASS_ADDRESS', undefined)
+const addressAtom = atomWithStorage<Address | undefined>('SIGPASS_ADDRESS', undefined)
 
 export default function SigpassKit() {
 
@@ -42,7 +42,7 @@ export default function SigpassKit() {
   const [wallet, setWallet] = useState<boolean>(false);
 
   // set the open state
-  const [open, setOpen] = useState<boolean>(false);
+  const [walletOpen, setWalletOpen] = useState<boolean>(false);
 
   // set the webAuthn support state
   const [webAuthnSupport, setWebAuthnSupport] = useState<boolean>(false);
@@ -125,7 +125,7 @@ export default function SigpassKit() {
     return (
       <div className="flex flex-row gap-2 items-center">
         {!wallet && !account.isConnected && !address ? (
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={walletOpen} onOpenChange={setWalletOpen}>
             <DialogTrigger asChild>
               <Button className="rounded-xl font-bold text-md hover:scale-105 transition-transform">Create Wallet</Button>
             </DialogTrigger>
@@ -199,7 +199,7 @@ export default function SigpassKit() {
             Get Wallet
           </Button>
         ) : wallet && !account.isConnected && address ? 
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={walletOpen} onOpenChange={setWalletOpen}>
             <DialogTrigger asChild>
               <Button 
                 className="border-2 border-primary rounded-xl font-bold text-md hover:scale-105 transition-transform"
@@ -216,6 +216,7 @@ export default function SigpassKit() {
               <DialogDescription className="flex flex-col gap-2 text-primary text-center font-bold text-lg items-center">
                 {truncateAddress(address)}
               </DialogDescription>
+              <Balances />
               <div className="grid grid-cols-2 gap-4">
                 <Button onClick={copyAddress} className="rounded-xl font-bold text-md hover:scale-105 transition-transform">
                   {isCopied ? (
@@ -248,7 +249,7 @@ export default function SigpassKit() {
   return (
     <div className="flex flex-row gap-2 items-center">
       {(!wallet && !account.isConnected && !address) ? (
-        <Drawer open={open} onOpenChange={setOpen}>
+        <Drawer open={walletOpen} onOpenChange={setWalletOpen}>
           <DrawerTrigger asChild>
             <Button className="rounded-xl font-bold text-md hover:scale-105 transition-transform">Create Wallet</Button>
           </DrawerTrigger>
@@ -321,7 +322,7 @@ export default function SigpassKit() {
           Get Wallet
         </Button>
       ) : wallet && !account.isConnected && address ? (
-        <Drawer open={open} onOpenChange={setOpen}>
+        <Drawer open={walletOpen} onOpenChange={setWalletOpen}>
           <DrawerTrigger asChild>
             <Button 
               className="border-2 border-primary rounded-xl font-bold text-md hover:scale-105 transition-transform"
@@ -346,6 +347,7 @@ export default function SigpassKit() {
               </DrawerDescription>
             </DrawerHeader>
             <div className="flex flex-col items-center gap-2">
+              <Balances />
               <div className="grid grid-cols-2 gap-4">
                 <Button onClick={copyAddress} className="rounded-xl font-bold text-md hover:scale-105 transition-transform">
                   {isCopied ? (
@@ -374,3 +376,45 @@ export default function SigpassKit() {
   )
 }
 
+function Balances() {
+
+  // set the balances open state
+  const [balancesOpen, setBalancesOpen] = useState<boolean>(false);
+
+  // check if the user is on desktop
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  if (isDesktop) {
+    return (
+      <Dialog open={balancesOpen} onOpenChange={setBalancesOpen}>
+        <DialogTrigger asChild>
+          <Button variant="ghost" className="rounded-xl font-bold text-md hover:scale-105 transition-transform">
+            Balances
+            <ChevronRight />
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Balances</DialogTitle>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  return (
+    <Drawer open={balancesOpen} onOpenChange={setBalancesOpen}>
+      <DrawerTrigger asChild>
+        <Button variant="ghost" className="rounded-xl font-bold text-md hover:scale-105 transition-transform">
+          Balances
+          <ChevronRight />
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Balances</DrawerTitle>
+        </DrawerHeader>
+      </DrawerContent>
+    </Drawer>
+  )
+}

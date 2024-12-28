@@ -23,6 +23,7 @@ import {
 } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider, createConfig, http } from 'wagmi';
+import { Provider as JotaiProvider } from 'jotai';
 // import according to docs
 
 const { wallets } = getDefaultWallets();
@@ -76,12 +77,14 @@ const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
+    <JotaiProvider>
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider>
           {children}
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </JotaiProvider>
   );
 }
