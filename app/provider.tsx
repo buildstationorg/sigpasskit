@@ -11,15 +11,39 @@ import {
   ledgerWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import {
+  arbitrum,
+  arbitrumSepolia,
+  base,
+  baseSepolia,
+  optimism,
+  optimismSepolia,
+  sepolia,
   kaia,
   kairos
 } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WagmiProvider, http } from 'wagmi';
+import { WagmiProvider, createConfig, http } from 'wagmi';
 // import according to docs
 
 const { wallets } = getDefaultWallets();
 // initialize and destructure wallets object
+
+// create a local config for the wallet
+export const localConfig = createConfig({
+  chains: [arbitrum, arbitrumSepolia, base, baseSepolia, optimism, optimismSepolia, sepolia, kaia, kairos],
+  transports: {
+    [arbitrum.id]: http(),
+    [arbitrumSepolia.id]: http(),
+    [base.id]: http(),
+    [baseSepolia.id]: http(),
+    [optimism.id]: http(),
+    [optimismSepolia.id]: http(),
+    [sepolia.id]: http(),
+    [kaia.id]: http(),
+    [kairos.id]: http(),
+  },
+  ssr: true,
+});
 
 const config = getDefaultConfig({
   appName: 'SIGPASS', // Name your app
@@ -32,12 +56,18 @@ const config = getDefaultConfig({
     },
   ],
   chains: [
-    kaia,
-    kairos
+    arbitrum, arbitrumSepolia, base, baseSepolia, optimism, optimismSepolia, sepolia, kaia, kairos
   ],
   transports: {
-    [kaia.id]: http('https://rpc.ankr.com/kaia'),
-    [kairos.id]: http('https://rpc.ankr.com/kaia_testnet'),
+    [arbitrum.id]: http(),
+    [arbitrumSepolia.id]: http(),
+    [base.id]: http(),
+    [baseSepolia.id]: http(),
+    [optimism.id]: http(),
+    [optimismSepolia.id]: http(),
+    [sepolia.id]: http(),
+    [kaia.id]: http(),
+    [kairos.id]: http(),
   },
   ssr: true, // Because it is Nextjs's App router, you need to declare ssr as true
 });
