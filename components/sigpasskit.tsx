@@ -88,16 +88,17 @@ export default function SigpassKit() {
   async function createWallet() {
     const account = await createSigpassWallet("dapp");
     if (account) {
-      setOpen(false);
+      setWalletOpen(false);
       setWallet(true);
     }
   }
 
   // truncate address to 6 characters and add ... at the end
-  function truncateAddress(address: Address, length: number) {
-    if (length > 6) {
+  function truncateAddress(address: Address, length: number = 0) {
+    if (length !== 0) {
       return `${address.slice(0, length)}...${address.slice(-length)}`;
-    } else {
+    } 
+    if (length === 0) {
       return `${address.slice(0, 6)}...${address.slice(-4)}`;
     }
   }
@@ -116,7 +117,7 @@ export default function SigpassKit() {
   // disconnect the wallet
   function disconnect() {
     setAddress(undefined);
-    setOpen(false);
+    setWalletOpen(false);
     setAddress(RESET);
   }
 
