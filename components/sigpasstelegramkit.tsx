@@ -33,9 +33,11 @@ import {
   X, 
   ChevronRight,
   ScanFace,
-  Undo
+  Undo,
+  Settings
 } from 'lucide-react';
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -96,6 +98,9 @@ export default function SigpassTelegramKit() {
   // check if the address is copied
   const [isCopied, setIsCopied] = useState(false);
 
+  // toast
+  const { toast } = useToast()
+
   // test
   const [biometricAccess, setBiometricAccess] = useAtom(biometricAccessAtom);
 
@@ -140,6 +145,11 @@ export default function SigpassTelegramKit() {
     // Convert bytes to base64 string for safe transmission
     const bytesString = Buffer.from(bytes).toString('base64');
     postEvent('web_app_biometry_update_token', { token: bytesString });
+    toast({
+      title: "Wallet created",
+      description: "Your wallet has been created and stored securely in your Telegram app",
+    })
+    setWalletOpen(false);
     setWallet(true);
   }
 
@@ -159,16 +169,23 @@ export default function SigpassTelegramKit() {
   useEffect(() => {
     // Set up the biometry auth listener
     const removeListener = on('biometry_auth_requested', payload => {
-      console.log('Biometry auth requested:', payload);
       // setBiometryToken(payload?.token || null);
       const biometricAccessStatus = payload?.status;
       const bytes = payload?.token;
       if (biometricAccessStatus === 'authorized' && !bytes) {
         setBiometricAccess(true);
+        toast({
+          title: "Biometric access granted",
+          description: "You can now create your wallet",
+        })
       }
 
       if (biometricAccessStatus === 'authorized' && !bytes) {
-        console.log('Declined:');
+        toast({
+          variant: "destructive",
+          title: "Biometric access denied",
+          description: "Please grant the app biometric access to create your wallet",
+        })
       }
       if (!bytes) {
         return null;
@@ -192,7 +209,7 @@ export default function SigpassTelegramKit() {
 
     // Clean up the listener when component unmounts
     return () => removeListener();
-  }, [setBiometricAccess, setAddress]);
+  }, [setBiometricAccess, setAddress, toast]);
 
 
   function requestBiometricAccess() {
@@ -200,6 +217,10 @@ export default function SigpassTelegramKit() {
       reason: 'Please grant the app biometric access to create your wallet',
     });
     setBiometricAccess(true);
+  }
+
+  function openBiometricSettings() {
+    postEvent('web_app_biometry_open_settings');
   }
 
   function resetEverything() {
@@ -471,6 +492,9 @@ export default function SigpassTelegramKit() {
       {!address ? <ConnectButton /> : null}
       <Button size="icon" onClick={resetEverything}>
         <Undo />
+      </Button>
+      <Button size="icon" onClick={openBiometricSettings}>
+        <Settings />
       </Button>
     </div>
   )
