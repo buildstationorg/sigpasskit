@@ -348,9 +348,14 @@ export default function SigpassTelegramKit() {
         {
           !address ? <ConnectButton /> : null
         }
-        <Button size="icon" onClick={resetEverything}>
-          <Undo />
-        </Button>
+        <div className="absolute top-4 right-4 flex flex-row gap-2 items-center">
+          <Button size="icon" onClick={resetEverything}>
+            <Undo />
+          </Button>
+          <Button size="icon" onClick={openBiometricSettings}>
+            <Settings />
+          </Button>
+        </div>
       </div>
     )
   }
@@ -490,12 +495,14 @@ export default function SigpassTelegramKit() {
         </Drawer>
       ) : null}
       {!address ? <ConnectButton /> : null}
-      <Button size="icon" onClick={resetEverything}>
-        <Undo />
-      </Button>
-      <Button size="icon" onClick={openBiometricSettings}>
-        <Settings />
-      </Button>
+      <div className="absolute top-4 right-4 flex flex-row gap-2 items-center">
+        <Button size="icon" onClick={resetEverything}>
+          <Undo />
+        </Button>
+        <Button size="icon" onClick={openBiometricSettings}>
+          <Settings />
+        </Button>
+      </div>
     </div>
   )
 }
