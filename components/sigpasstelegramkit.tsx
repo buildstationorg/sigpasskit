@@ -180,7 +180,7 @@ export default function SigpassTelegramKit() {
         })
       }
 
-      if (biometricAccessStatus === 'authorized' && !bytes) {
+      if (biometricAccessStatus === 'failed' && !bytes) {
         toast({
           variant: "destructive",
           title: "Biometric access denied",
@@ -211,12 +211,35 @@ export default function SigpassTelegramKit() {
     return () => removeListener();
   }, [setBiometricAccess, setAddress, toast]);
 
+  useEffect(() => {
+    // Set up the biometry auth listener
+    const removeListener = on('biometry_info_received', payload => {
+      // setBiometryToken(payload?.token || null);
+      if (payload?.available) {
+        const biometricAccessRequested = payload?.access_requested;
+        const biometricAccessGranted = payload?.access_granted;
+        if (biometricAccessRequested && !biometricAccessGranted) {
+          openBiometricSettings();
+        }
+        if (biometricAccessRequested && biometricAccessGranted) {
+          setBiometricAccess(true);
+          toast({
+            title: "Biometric access granted",
+            description: "You can now create your wallet",
+          })
+        }
+      }
+    });
+
+    // Clean up the listener when component unmounts
+    return () => removeListener();
+  }, [setBiometricAccess, toast]);
 
   function requestBiometricAccess() {
     postEvent('web_app_biometry_request_access', {
       reason: 'Please grant the app biometric access to create your wallet',
     });
-    setBiometricAccess(true);
+    postEvent('web_app_biometry_get_info')
   }
 
   function openBiometricSettings() {
