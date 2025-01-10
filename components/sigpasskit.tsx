@@ -1,14 +1,30 @@
 "use client";
 
+// react imports
 import { useState, useEffect } from "react";
+
+// rainbowkit
 import '@rainbow-me/rainbowkit/styles.css';
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { Button } from "@/components/ui/button";
-import { Copy, Check, KeyRound, Ban, ExternalLink, LogOut, ChevronDown, X, ChevronRight } from 'lucide-react';
+
+// viem
 import { Address } from 'viem';
-import { createSigpassWallet, getSigpassWallet, checkSigpassWallet, checkBrowserWebAuthnSupport } from "@/lib/sigpass";
+
+// sigpass
+import { 
+  createSigpassWallet, 
+  getSigpassWallet, 
+  checkSigpassWallet, 
+  checkBrowserWebAuthnSupport
+} from "@/lib/sigpass";
+
+// wagmi
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
+
+// UI elements
+import { Copy, Check, KeyRound, Ban, ExternalLink, LogOut, ChevronDown, X, ChevronRight } from 'lucide-react';
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +44,11 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
+
+// image
 import Image from 'next/image';
+
+// jotai for state management
 import { useAtom } from 'jotai';
 import { atomWithStorage, RESET } from 'jotai/utils';
 
@@ -70,8 +90,8 @@ export default function SigpassKit() {
 
   // check if the browser supports WebAuthn
   useEffect(() => {
-    const support = checkBrowserWebAuthnSupport();
-    setWebAuthnSupport(support);
+    const webAuthnSupport = checkBrowserWebAuthnSupport();
+    setWebAuthnSupport(webAuthnSupport);
   }, []);
 
   // get the wallet

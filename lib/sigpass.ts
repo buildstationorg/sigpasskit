@@ -1,3 +1,14 @@
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp?: {
+        initData: string;
+        initDataUnsafe: unknown;
+      };
+    };
+  }
+}
+
 /**
  * SIGPASS
  * 
@@ -84,11 +95,28 @@ async function getOrThrow(id: Uint8Array) {
  */
 function checkBrowserWebAuthnSupport(): boolean {
 
-  if (!navigator.credentials) {
+  if (navigator.credentials) {
+    return true;
+  } else {
     return false;
   }
+}
 
-  return true;
+/**
+ * Check if the user is in a Telegram Mini App
+ * 
+ * @returns boolean
+ */
+function checkTelegramMiniApp(): boolean {
+  try {
+    // Check if we're in Telegram's mini app environment
+    return Boolean(
+      window.Telegram?.WebApp?.initData && 
+      window.Telegram?.WebApp?.initDataUnsafe
+    );
+  } catch (error) {
+    return false;
+  }
 }
 
 async function createSigpassWallet(name: string) {
@@ -164,5 +192,5 @@ async function getSigpassWallet() {
   }
 }
 
-export { createOrThrow, getOrThrow, checkBrowserWebAuthnSupport, createSigpassWallet, getSigpassWallet, checkSigpassWallet };
+export { createOrThrow, getOrThrow, checkBrowserWebAuthnSupport, checkTelegramMiniApp, createSigpassWallet, getSigpassWallet, checkSigpassWallet };
 
