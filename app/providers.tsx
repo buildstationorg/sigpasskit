@@ -47,7 +47,7 @@ export const localConfig = createConfig({
 });
 
 const config = getDefaultConfig({
-  appName: 'SIGPASS', // Name your app
+  appName: 'SIGPASSKIT', // Name your app
   projectId: "68a1d22856b8144f2ce4692afa1e40a4", // Enter your WalletConnect Project ID here
   wallets: [
     ...wallets,

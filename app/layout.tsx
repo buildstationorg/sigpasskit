@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import '@rainbow-me/rainbowkit/styles.css';
-import { Providers } from '@/app/provider';
+import { Providers } from '@/app/providers';
 import { Toaster } from "@/components/ui/toaster"
-import Script from "next/script";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -18,8 +17,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Sigpass",
-  description: "A simple connect wallet for your dapp",
+  title: "SigpassKit",
+  description: "A simple connect wallet kit for your dapp",
 };
 
 export default function RootLayout({
@@ -29,11 +28,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Script  
-        defer 
-        src="https://assets.onedollarstats.com/stonks.js" 
-        id="stonks" > 
-      </Script>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
